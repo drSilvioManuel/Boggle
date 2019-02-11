@@ -1,4 +1,5 @@
 import edu.princeton.cs.algs4.In;
+import edu.princeton.cs.algs4.StdOut;
 
 public class BoggleBoard {
 
@@ -41,7 +42,7 @@ public class BoggleBoard {
 
                 board[i][j++] = c;
 
-                if (c == 'Q') n++;
+                if (c == 'Q') n++; // skip 'u'
             }
             i++;
         }
@@ -74,6 +75,19 @@ public class BoggleBoard {
     // Returns a string representation of the board.
     public String toString() {
         throw new RuntimeException("Not implemented");
+    }
+
+    public static void main(String[] args) {
+        In in = new In(args[0]);
+        String[] dictionary = in.readAllStrings();
+        BoggleSolver solver = new BoggleSolver(dictionary);
+        BoggleBoard board = new BoggleBoard(args[1]);
+        int score = 0;
+        for (String word : solver.getAllValidWords(board)) {
+            StdOut.println(word);
+            score += solver.scoreOf(word);
+        }
+        StdOut.println("Score = " + score);
     }
 
     private static void throwExceptionIfNull(Object... args) {

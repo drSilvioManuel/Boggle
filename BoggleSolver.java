@@ -36,7 +36,25 @@ public class BoggleSolver {
     // Returns the score of the given word if it is in the dictionary, zero otherwise.
     // (You can assume the word contains only the uppercase letters A through Z.)
     public int scoreOf(String word) {
-        throw new RuntimeException("Not implemented");
+        StringBuilder str = new StringBuilder();
+        int wordLength = word.length();
+        int scoringLength = 2;
+        if (wordLength < ++scoringLength) return 0;
+        ++scoringLength;
+        for (int i = 0; i < wordLength; i++) {
+            char c = word.charAt(i);
+            str.append(c);
+            if (c == 'Q') i++;
+        }
+        Trie.Node x = dict.get(str);
+        if (null == x || !x.isLeaf) return 0;
+        int score = 0;
+        if (wordLength < ++scoringLength) return ++score;
+        if (wordLength < ++scoringLength) return ++score;
+        if (wordLength < ++scoringLength) return ++score;
+        if (wordLength < ++scoringLength) return (++score + 1);
+
+        return scoringLength + score - 1;
     }
 
     class Sequence {
@@ -98,6 +116,7 @@ public class BoggleSolver {
         private static class Node {
             private Node[] next = new Node[R];
             private boolean isLeaf;
+            private boolean isSeaquenceWithQ;
         }
 
         Node get(StringBuilder key) {
@@ -121,12 +140,6 @@ public class BoggleSolver {
             throwExceptionIfNull(key);
 
             root = put(root, key, 0);
-        }
-
-        Node put(Node node, char c) {
-            int index = c - SHIFT;
-            node.next[index] = new Node();
-            return node.next[index];
         }
 
         private Node put(Node node, String key, int d) {
