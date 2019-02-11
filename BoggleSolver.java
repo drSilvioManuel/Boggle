@@ -75,7 +75,9 @@ public class BoggleSolver {
         void fillIn(int r, int c, Set<String> words) {
 
             StringBuilder str = new StringBuilder();
-            str.append(board.getLetter(r, c));
+            char ch = board.getLetter(r, c);
+            str.append(ch);
+            if (ch == 'Q') str.append('U');
             visited[r][c] = true;
 
             moveToNextChar(r, c, str, words);
