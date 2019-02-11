@@ -6,6 +6,7 @@ public class BoggleBoard {
     private final int rows;
     private final int cols;
     private final char[][] board;
+
     // Initializes a random 4-by-4 Boggle board.
     // (by rolling the Hasbro dice)
     public BoggleBoard() {
@@ -74,7 +75,17 @@ public class BoggleBoard {
 
     // Returns a string representation of the board.
     public String toString() {
-        throw new RuntimeException("Not implemented");
+        StringBuilder str = new StringBuilder();
+        str.append(rows).append(" ").append(cols).append('\n');
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                str.append(getLetter(i, j));
+
+                if (j + 1 == cols) str.append('\n');
+                else str.append(" ");
+            }
+        }
+        return str.toString();
     }
 
     public static void main(String[] args) {
@@ -89,6 +100,7 @@ public class BoggleBoard {
             score += s;
         }
         StdOut.println("Score = " + score);
+        StdOut.print(board.toString());
     }
 
     private static void throwExceptionIfNull(Object... args) {
