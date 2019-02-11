@@ -38,23 +38,19 @@ public class BoggleSolver {
     public int scoreOf(String word) {
         StringBuilder str = new StringBuilder();
         int wordLength = word.length();
-        int scoringLength = 2;
-        if (wordLength < ++scoringLength) return 0;
-        ++scoringLength;
+        if (wordLength < 3) return 0;
         for (int i = 0; i < wordLength; i++) {
             char c = word.charAt(i);
             str.append(c);
-            if (c == 'Q') i++;
         }
         Trie.Node x = dict.get(str);
         if (null == x || !x.isLeaf) return 0;
-        int score = 0;
-        if (wordLength < ++scoringLength) return ++score;
-        if (wordLength < ++scoringLength) return ++score;
-        if (wordLength < ++scoringLength) return ++score;
-        if (wordLength < ++scoringLength) return (++score + 1);
 
-        return scoringLength + score - 1;
+        if (wordLength <= 4) return 1;
+        else if (wordLength <= 5) return 2;
+        else if (wordLength <= 6) return 3;
+        else if (wordLength <= 7) return 5;
+        else return 11;
     }
 
     class Sequence {
@@ -80,6 +76,7 @@ public class BoggleSolver {
 
             StringBuilder str = new StringBuilder();
             str.append(board.getLetter(r, c));
+            visited[r][c] = true;
 
             moveToNextChar(r, c, str, words);
         }
@@ -94,13 +91,16 @@ public class BoggleSolver {
                     visited[r][c] = true;
                     char ch = board.getLetter(r, c);
                     str.append(ch);
+                    if (ch == 'Q') str.append('U');
                     Trie.Node node = dict.get(str);
 
                     if (null != node) {
-                        if (node.isLeaf) words.add(str.toString());
+                        if (node.isLeaf && str.length() > 2) words.add(str.toString());
                         moveToNextChar(r, c, str, words);
                     }
                     str.deleteCharAt(str.length() - 1);
+                    if (ch == 'Q') str.deleteCharAt(str.length() - 1);
+                    visited[r][c] = false;
                 }
             } while (pointer < pos.length);
         }
@@ -116,7 +116,6 @@ public class BoggleSolver {
         private static class Node {
             private Node[] next = new Node[R];
             private boolean isLeaf;
-            private boolean isSeaquenceWithQ;
         }
 
         Node get(StringBuilder key) {

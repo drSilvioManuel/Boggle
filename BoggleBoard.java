@@ -84,8 +84,9 @@ public class BoggleBoard {
         BoggleBoard board = new BoggleBoard(args[1]);
         int score = 0;
         for (String word : solver.getAllValidWords(board)) {
-            StdOut.println(word);
-            score += solver.scoreOf(word);
+            int s = solver.scoreOf(word);
+            StdOut.println(word + " : " + s);
+            score += s;
         }
         StdOut.println("Score = " + score);
     }
