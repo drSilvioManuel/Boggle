@@ -9,7 +9,7 @@ public class BoggleSolver {
     // Initializes the data structure using the given array of strings as the dictionary.
     // (You can assume each word in the dictionary contains only the uppercase letters A through Z.)
     public BoggleSolver(String[] dictionary) {
-        throwExceptionIfNull(dictionary);
+        if (null == dictionary) throw new IllegalArgumentException();
 
         for (String word : dictionary) {
             dict.put(word);
@@ -18,7 +18,7 @@ public class BoggleSolver {
 
     // Returns the set of all valid words in the given Boggle board, as an Iterable.
     public Iterable<String> getAllValidWords(BoggleBoard board) {
-        throwExceptionIfNull(board);
+        if (null == board) throw new IllegalArgumentException();
 
         int rows = board.rows();
         int cols = board.cols();
@@ -53,7 +53,7 @@ public class BoggleSolver {
         else return 11;
     }
 
-    class Sequence {
+    private class Sequence {
 
         final int rowCnt;
         final int colCnt;
@@ -121,7 +121,6 @@ public class BoggleSolver {
         }
 
         Node get(StringBuilder key) {
-            throwExceptionIfNull(key);
 
             Node node = get(root, key, 0);
 
@@ -138,8 +137,6 @@ public class BoggleSolver {
         }
 
         void put(String key) {
-            throwExceptionIfNull(key);
-
             root = put(root, key, 0);
         }
 
@@ -154,10 +151,5 @@ public class BoggleSolver {
             node.next[index] = put(node.next[index], key, d + 1);
             return node;
         }
-    }
-
-    private static void throwExceptionIfNull(Object... args) {
-        for (Object arg : args)
-            if (arg == null) throw new IllegalArgumentException();
     }
 }
