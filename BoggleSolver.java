@@ -1,39 +1,36 @@
-import edu.princeton.cs.algs4.Bag;
-import edu.princeton.cs.algs4.SET;
-import edu.princeton.cs.algs4.TST;
-
-import java.util.Collections;
 import java.util.HashSet;
+import java.util.Set;
+
 
 public class BoggleSolver {
 
-    private final TST<Boolean> dict = new TST<>();
+    private final Trie dict = new Trie();
 
     // Initializes the data structure using the given array of strings as the dictionary.
     // (You can assume each word in the dictionary contains only the uppercase letters A through Z.)
     public BoggleSolver(String[] dictionary) {
+        throwExceptionIfNull(dictionary);
+
         for (String word : dictionary) {
-            dict.put(word, Boolean.TRUE);
+            dict.put(word);
         }
     }
 
     // Returns the set of all valid words in the given Boggle board, as an Iterable.
     public Iterable<String> getAllValidWords(BoggleBoard board) {
+        throwExceptionIfNull(board);
+
         int rows = board.rows();
         int cols = board.cols();
-        TST<Boolean> boardDict = new TST<>();
-
+        Set<String> words = new HashSet<>();
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
-                char c = board.getLetter(i, j);
-                Sequence w = new Sequence();
-                w.add(i, j, c);
-                w.move();
+                Sequence w = new Sequence(rows, cols, board);
+                w.fillIn(i, j, words);
             }
         }
 
-
-        return Collections.EMPTY_LIST;
+        return words;
     }
 
     // Returns the score of the given word if it is in the dictionary, zero otherwise.
@@ -43,42 +40,110 @@ public class BoggleSolver {
     }
 
     class Sequence {
-        StringBuilder chars = new StringBuilder();
-        int row;
-        int col;
-        int rowCnt;
-        int colCnt;
-        byte pointer;
-        HashSet<Integer> rows;
-        HashSet<Integer> cols;
+
+        final int rowCnt;
+        final int colCnt;
+        final boolean[][] visited;
+        final BoggleBoard board;
         int pos[][] = {
                 {-1, -1}, {-1, 0}, {-1, 1},
                 {0, -1}, {0, 1},
                 {1, -1}, {1, 0}, {1, 1}
         };
 
-        void add(int r, int c, char ch) {
-            row = r;
-            col = c;
-            rows.add(r);
-            cols.add(c);
-            chars.append(ch);
-            pointer = 0;
+        Sequence(int r, int c, BoggleBoard b) {
+            rowCnt = r;
+            colCnt = c;
+            visited = new boolean[r][c];
+            board = b;
         }
 
-        void move() {
-            int[] nextPos = calcRowCol();
+        void fillIn(int r, int c, Set<String> words) {
+
+            StringBuilder str = new StringBuilder();
+            str.append(board.getLetter(r, c));
+
+            moveToNextChar(r, c, str, words);
         }
 
-        int[] calcRowCol() {
-            int[] shift = null;
+        void moveToNextChar(int row, int col, StringBuilder str, Set<String> words) {
+            int pointer = 0;
             do {
-                shift = pos[pointer++];
-                if (shift[0] + row >= 0 && shift[1] + col >= 0 && shift[0] + row < rowCnt && shift[1] + col < colCnt) {
-                    return shift;
+                int[] shift = pos[pointer++];
+                int r = shift[0] + row;
+                int c = shift[1] + col;
+                if (r >= 0 && c >= 0 && r < rowCnt && c < colCnt && !visited[r][c]) {
+                    visited[r][c] = true;
+                    char ch = board.getLetter(r, c);
+                    str.append(ch);
+                    Trie.Node node = dict.get(str);
+
+                    if (null != node) {
+                        if (node.isLeaf) words.add(str.toString());
+                        moveToNextChar(r, c, str, words);
+                    }
+                    str.deleteCharAt(str.length() - 1);
                 }
             } while (pointer < pos.length);
-            return null;
         }
+    }
+
+    private static class Trie {
+
+        private static final int R = 26;
+        private static final char SHIFT = 'A';
+        private Node root;
+        private int n;
+
+        private static class Node {
+            private Node[] next = new Node[R];
+            private boolean isLeaf;
+        }
+
+        Node get(StringBuilder key) {
+            throwExceptionIfNull(key);
+
+            Node node = get(root, key, 0);
+
+            return node;
+        }
+
+        private Node get(Node node, StringBuilder key, int d) {
+            if (null == node) return null;
+            if (d == key.length()) return node;
+
+            int index = key.charAt(d) - SHIFT;
+
+            return get(node.next[index], key, d + 1);
+        }
+
+        void put(String key) {
+            throwExceptionIfNull(key);
+
+            root = put(root, key, 0);
+        }
+
+        Node put(Node node, char c) {
+            int index = c - SHIFT;
+            node.next[index] = new Node();
+            return node.next[index];
+        }
+
+        private Node put(Node node, String key, int d) {
+            if (null == node) node = new Node();
+            if (d == key.length()) {
+                if (!node.isLeaf) n++;
+                node.isLeaf = true;
+                return node;
+            }
+            int index = key.charAt(d) - SHIFT;
+            node.next[index] = put(node.next[index], key, d + 1);
+            return node;
+        }
+    }
+
+    private static void throwExceptionIfNull(Object... args) {
+        for (Object arg : args)
+            if (arg == null) throw new IllegalArgumentException();
     }
 }
